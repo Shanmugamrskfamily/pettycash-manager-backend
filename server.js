@@ -1,7 +1,7 @@
 //server.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const connectDB = require('./Database/mongodbConfig');
+const connectDB = require('./Database/MongodbConfiguration');
 const routes = require('./Routes/Routes');
 const cors = require('cors'); 
 
