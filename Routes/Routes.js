@@ -1,4 +1,4 @@
-//server.js
+//Routes.js
 const express = require('express');
 const router = express.Router();
 const userController = require('../Controllers/userController');
@@ -28,7 +28,7 @@ router.get('/expenses/all/:userId', expenseController.getAllExpenseTransactionsB
 router.get('/expenses/details/:userId/:expenseId', expenseController.getExpenseTransactionDetails);
 router.get('/expenses/totalPriceAndDate/:userId', expenseController.getAllExpenseTotalPriceAndDateByUserId);
 router.get('/expenses/total/:userId', expenseController.getTotalExpenseTransactionsCount);
-router.get('/expenses/cumulativeTotal/:userId', expenseController.getCumulativeTotalAllExpensesByUserId);
+router.get('/expenses/cumulativeTotal/:userId', expenseController.getCumulativeTotal);
 router.put('/expenses/edit', expenseController.editExpenseTransaction);
 router.delete('/expenses/delete/:userId/:transactionId', expenseController.deleteExpenseTransaction);
 

@@ -57,30 +57,41 @@ exports.addExpenses = async (req, res) => {
   };
 
 
-  exports.getCumulativeTotalAllExpensesByUserId = async (req, res) => {
-    try {
-      const { userId } = req.params; // Assuming userId is passed as a parameter in the URL
+//   exports.getCumulativeTotalAllExpensesByUserId = async (req, res) => {
+//     try {
+//       const { userId } = req.params; // Assuming userId is passed as a parameter in the URL
   
-      const totalAllExpenses = await Expenses.aggregate([
-        {
-          $match: { userId: userId } 
-        },
-        {
-          $group: {
-            _id: null,
-            totalAmount: { $sum: "$totalPrice" }
-          }
-        }
-      ]);
+//       const totalAllExpenses = await Expenses.aggregate([
+//         {
+//           $match: { userId: userId } 
+//         },
+//         {
+//           $group: {
+//             _id: null,
+//             totalAmount: { $sum: "$totalPrice" }
+//           }
+//         }
+//       ]);
   
-      const cumulativeTotalAmount = totalAllExpenses.length > 0 ? totalAllExpenses[0].totalAmount : 0;
+//       const cumulativeTotalAmount = totalAllExpenses.length > 0 ? totalAllExpenses[0].totalAmount : 0;
       
-      const userTransactions = await Expenses.find({ userId });
 
-      res.status(200).json({ cumulativeTotalExpense: cumulativeTotalAmount, userTransactions });
+//       res.status(200).json({ cumulativeTotalExpense: cumulativeTotalAmount });
+//     } catch (error) {
+//       res.status(500).json({ message: 'Error getting cumulative total expense amount', error });
+//       console.log(error);
+//     }
+//   };
+
+exports.getCumulativeTotal = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const expenses = await Expenses.find({ userId: userId });
+      const total = expenses.reduce((acc, expense) => acc + expense.totalPrice, 0);
+      res.status(200).json({ total: total });
     } catch (error) {
-      res.status(500).json({ message: 'Error getting cumulative total expense amount', error });
-      console.log(error);
+      console.error('Error fetching expenses:', error);
+      res.status(500).json({ message: 'Server Error' });
     }
   };
 
@@ -112,7 +123,7 @@ exports.addExpenses = async (req, res) => {
 
   exports.editExpenseTransaction = async (req, res) => {
     try {
-      const { userId, transactionId, title, category, date, price, quantity, description } = req.body;
+      const { userId, expenseId, title, category, date, price, quantity, description } = req.body;
   
       const totalPrice = price * quantity; // Calculate total price
   
@@ -120,7 +131,7 @@ exports.addExpenses = async (req, res) => {
       const userCapital = await Capital.findOne({ userId });
 
       // Find the existing expense transaction
-      const expense = await Expenses.findOne({_id: transactionId, userId});
+      const expense = await Expenses.findOne({_id: expenseId, userId});
 
       if (!expense) {
         return res.status(404).json({ message: 'Expense transaction not found' });
