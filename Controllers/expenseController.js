@@ -6,18 +6,18 @@ exports.addExpenses = async (req, res) => {
     try {
       const { userId, title, category, date, price, quantity, description } = req.body;
   
-      const totalPrice = price * quantity; // Calculate total price
+      const totalPrice = price * quantity; 
   
-      // Check if the user's capital balance is sufficient for the expense
+      
       const userCapital = await Capital.findOne({ userId });
       if (!userCapital || userCapital.amount < totalPrice) {
         return res.status(400).json({ message: 'Insufficient capital balance for this expense' });
       }
   
-      // Proceed with adding the expense
+      
       const expense = await Expenses.create({ userId, title, category, date, price, quantity, description, totalPrice });
   
-      // Update the user's capital balance by subtracting the totalPrice of the expense
+      
       userCapital.amount -= totalPrice;
       await userCapital.save();
   
@@ -30,7 +30,7 @@ exports.addExpenses = async (req, res) => {
 
   exports.getExpenseTransactionDetails = async (req, res) => {
     try {
-      const { userId, expenseId } = req.params; // Assuming userId and expenseId are passed as parameters in the URL
+      const { userId, expenseId } = req.params; 
   
       const expenseDetails = await Expenses.findOne({ userId, _id: expenseId });
   
@@ -46,7 +46,7 @@ exports.addExpenses = async (req, res) => {
   
   exports.getTotalExpenseTransactionsCount = async (req, res) => {
     try {
-      const { userId } = req.params; // Assuming userId is passed as a parameter in the URL
+      const { userId } = req.params; 
   
       const totalTransactionsCount = await Expenses.countDocuments({ userId });
   
@@ -97,9 +97,9 @@ exports.getCumulativeTotal = async (req, res) => {
 
   exports.getAllExpenseTransactionsByUserId = async (req, res) => {
     try {
-      const { userId } = req.params; // Assuming userId is passed as a parameter in the URL
+      const { userId } = req.params; 
   
-      // Fetch all expense transactions for the specified user, sorted by date in descending order
+      
       const expenseTransactions = await Expenses.find({ userId }).sort({ date: -1 });
   
       res.status(200).json({ expenseTransactions });
@@ -110,10 +110,10 @@ exports.getCumulativeTotal = async (req, res) => {
 
   exports.getAllExpenseTotalPriceAndDateByUserId = async (req, res) => {
     try {
-      const { userId } = req.params; // Assuming userId is passed as a parameter in the URL
+      const { userId } = req.params; 
   
-      const expenses = await Expenses.find({ userId }, 'totalPrice date') // Selecting only totalPrice and date
-        .sort({ date: 1 }); // Sort by date in ascending order (oldest to newest)
+      const expenses = await Expenses.find({ userId }, 'totalPrice date') 
+        .sort({ date: 1 }); 
   
       res.status(200).json({ expenses });
     } catch (error) {
@@ -125,12 +125,12 @@ exports.getCumulativeTotal = async (req, res) => {
     try {
       const { userId, expenseId, title, category, date, price, quantity, description } = req.body;
   
-      const totalPrice = price * quantity; // Calculate total price
+      const totalPrice = price * quantity; 
   
-      // Check if the user's capital balance is sufficient for the updated expense
+      
       const userCapital = await Capital.findOne({ userId });
 
-      // Find the existing expense transaction
+      
       const expense = await Expenses.findOne({_id: expenseId, userId});
 
       if (!expense) {
@@ -144,7 +144,7 @@ exports.getCumulativeTotal = async (req, res) => {
       }
   
 
-       // Update the user's capital balance by subtracting the totalPrice of the expense
+       
        if(totalPrice>=expense.totalPrice)
        {
          const sub = totalPrice - expense.totalPrice;
@@ -159,7 +159,7 @@ exports.getCumulativeTotal = async (req, res) => {
        await userCapital.save();
      }
 
-      // Update the expense transaction with the new values
+      
       expense.title = title;
       expense.category = category;
       expense.date = date;
@@ -168,7 +168,7 @@ exports.getCumulativeTotal = async (req, res) => {
       expense.description = description;
       expense.totalPrice = totalPrice;
   
-      // Update the expense
+      
       await expense.save();
   
      
@@ -183,22 +183,21 @@ exports.getCumulativeTotal = async (req, res) => {
 
   exports.deleteExpenseTransaction = async (req, res) => {
     try {
-      const { userId, transactionId } = req.params; // Assuming userId and transactionId are passed as parameters in the URL
+      const { userId, transactionId } = req.params; 
   
-      // Find and remove the expense transaction
+      
       const deletedTransaction = await Expenses.findOneAndDelete({ userId, _id: transactionId });
   
       if (!deletedTransaction) {
         return res.status(404).json({ message: 'Expense transaction not found for this user' });
       }
   
-      // Fetch the user's capital to update the amount
+      
       const userCapital = await Capital.findOne({ userId });
       if (!userCapital) {
         return res.status(404).json({ message: 'User capital data not found' });
       }
-  
-      // Update the user's capital by adding the total price of the deleted transaction
+      
       userCapital.amount += deletedTransaction.totalPrice;
       await userCapital.save();
   

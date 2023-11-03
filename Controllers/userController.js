@@ -15,17 +15,17 @@ exports.signup = async (req, res) => {
   try {
     const { name, mobileNumber, email, password, avatar } = req.body;
 
-    // Check if the user with the same email already exists
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: 'User with this email already exists.' });
     }
 
-    // Hash the password using bcrypt
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Generate an email verification token
+   
     const emailVerificationToken = crypto.randomBytes(4).toString('hex');
 
     const user = new User({
@@ -35,11 +35,11 @@ exports.signup = async (req, res) => {
       avatar,
       password: hashedPassword,
       emailVerificationToken,
-      emailVerified: false, // Mark the email as unverified
+      emailVerified: false, 
     });
 
     await user.save();
-    // Send an email with the verification link
+    
     const verificationOtp = emailVerificationToken;
 
     const transporter = nodemailer.createTransport({
@@ -63,7 +63,7 @@ exports.signup = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    res.status(201).json({ message: "User registered successfully. Please verify your email.", emailVerificationToken, userId: user._id });
+    res.status(201).json({ message: "User registered successfully. Please verify your email."});
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -71,7 +71,7 @@ exports.signup = async (req, res) => {
 
 exports.getAllAvatars = async (req, res) => {
     try {
-      // Fetch all avatar details from the database
+      
       const avatars = await avatar.find();
   
       res.status(200).json({ avatars });
@@ -84,18 +84,18 @@ exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.body;
 
-    // Find the user by the provided email verification token
+    
     const user = await User.findOne({
       emailVerificationToken: token,
-      emailVerified: false, // Check if the email is not verified yet
+      emailVerified: false, 
     });
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired verification token.', });
     }
-    // Update the user's email verification status
+    
     user.emailVerified = true;
-    user.emailVerificationToken = undefined; // Clear the verification token
+    user.emailVerificationToken = undefined; 
     await user.save();
 
     const transporterVerified = nodemailer.createTransport({
@@ -129,24 +129,24 @@ exports.login = async (req, res) => {
     try {
       const { email, password } = req.body;
   
-      // Check if the user with the provided email exists
+      
       const user = await User.findOne({ email });
       if (!user) {
         return res.status(401).json({ message: 'Authentication failed. User not found.' });
       }
   
-      // Check if the user's email is verified
+      
       if (!user.emailVerified) {
         return res.status(401).json({ message: 'Authentication failed. Email not verified.' });
       }
   
-      // Verify the password
+      
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Authentication failed. Invalid password.' });
       }
   
-      // Create a JWT token
+      
       const token = jwt.sign({ userId: user._id }, SECRET_KEY);
       user.jwtToken=token;
       await user.save();
@@ -194,7 +194,7 @@ exports.sendPasswordResetLink = async (req, res) => {
   
       await transporter.sendMail(mailOptions);
   
-      res.status(200).json({ message: 'Password reset link sent to your email.',otp });
+      res.status(200).json({ message: 'Password reset OTP sent to your email.'});
     } 
     catch (error) 
     {
@@ -212,16 +212,16 @@ exports.setNewPassword = async (req, res) => {
       if (!user) {
         return res.status(400).json({ message: 'Invalid or expired reset token.' });
       }
-      // Hash the new password
+      
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
   console.log(hashedPassword);
-      // Update the user's password
+      
       user.password = hashedPassword;
   
-      // Clear the emailVerificationToken fields
+      
       user.emailVerificationToken = undefined;
-      // Save the updated user document
+      
       await user.save();
       const transporter = nodemailer.createTransport({
         service: 'Outlook',
@@ -255,14 +255,14 @@ exports.setNewPassword = async (req, res) => {
     try {
       const userId = req.params.userId;
   
-      // Find the user by their user ID
+      
       const user = await User.findById(userId);
   
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // Return user information
+      
       res.status(200).json({ user });
     } catch (error) {
       res.status(500).json({ message: 'Something went wrong.', error });
@@ -274,17 +274,17 @@ exports.setNewPassword = async (req, res) => {
       const {userId}=req.params;
       const {  name, mobileNumber, avatar, newEmail } = req.body;
   
-      // Generate an OTP for email verification
+      
       const otp = crypto.randomBytes(4).toString('hex');
-      // Store the OTP in the user's data
+      
       const user = await User.findOne({ _id: userId });
-      // console.log(user);
+      
       if (!user) {
         return res.status(400).json({ message: 'Invalid user.' });
       }
       user.emailVerificationToken = otp;
       await user.save();
-      // Send an email with the OTP for verification
+      
       const transporter = nodemailer.createTransport({
         service: 'Outlook',
         auth: {
@@ -317,7 +317,7 @@ exports.setNewPassword = async (req, res) => {
       const { userId, newName, newMobileNumber, newAvatar,newEmail, otp } = req.body;
   
   
-      // Verify the OTP
+      
       const user = await User.findOne({ _id: userId });
       if (!user || !user.emailVerificationToken) {
         return res.status(400).json({ message: 'Invalid user or token.' });
@@ -327,17 +327,17 @@ exports.setNewPassword = async (req, res) => {
         return res.status(400).json({ message: 'Invalid OTP.' });
       }
   
-      // Update user information
+      
       user.name = newName;
       user.mobileNumber = newMobileNumber;
       user.avatar = newAvatar;
       user.email = newEmail;
   
-      // Clear the email verification token
+      
       user.emailVerificationToken = undefined;
   
       await user.save();
-      //sending Profile update Confirmation Email
+      
       const transporterEmail = nodemailer.createTransport({
         service: 'Outlook',
         auth: {
