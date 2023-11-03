@@ -1,16 +1,28 @@
 const Capital = require('../Models/capitalModel');
 
 exports.addCapitalAmount = async (req, res) => {
-  try {
-    const { userId, amount } = req.body;
-
-    const capital = await Capital.create({ userId, amount });
-
-    res.status(201).json({ message: 'Capital amount added successfully', capital });
-  } catch (error) {
-    res.status(500).json({ message: 'Error adding capital amount', error });
-  }
-};
+    try {
+      const { userId, amount } = req.body;
+  
+      
+      const existingCapital = await Capital.findOne({ userId });
+  
+      if (existingCapital) {
+        
+        existingCapital.amount += amount;
+        await existingCapital.save();
+  
+        res.status(200).json({ message: 'Capital amount updated successfully', existingCapital });
+      } else {
+        
+        const capital = await Capital.create({ userId, amount });
+  
+        res.status(201).json({ message: 'Capital amount added successfully', capital });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error adding or updating capital amount', error });
+    }
+  };  
 
 exports.getCapitalAmount = async (req, res) => {
     try {
