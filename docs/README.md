@@ -12,6 +12,10 @@ The purpose is to facilitate the backend operations for the Pettycash Manager we
 
 The Pettycash Manager backend is deployed on Render URL: https://pettycash-manager-fullstack.onrender.com
 
+## API Documentation
+
+The API documentation is published using Postman: https://documenter.getpostman.com/view/28858691/2s9YXe8Pvx
+
 ## API Endpoints
 
 ### User Management
