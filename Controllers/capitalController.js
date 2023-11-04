@@ -1,3 +1,4 @@
+//capitalController.js
 const Capital = require('../Models/capitalModel');
 
 exports.addCapitalAmount = async (req, res) => {
