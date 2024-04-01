@@ -43,7 +43,7 @@ exports.signup = async (req, res) => {
     const verificationOtp = emailVerificationToken;
 
     const transporter = nodemailer.createTransport({
-      service: 'Outlook',
+      service: 'gmail',
       auth: {
         user: EMAIL,
         pass: E_PASS,
@@ -99,7 +99,7 @@ exports.verifyEmail = async (req, res) => {
     await user.save();
 
     const transporterVerified = nodemailer.createTransport({
-      service: 'Outlook',
+      service: 'gmail',
       auth: {
         user: EMAIL,
         pass: E_PASS,
@@ -174,7 +174,7 @@ exports.sendPasswordResetLink = async (req, res) => {
       await user.save();
   
       const transporter = nodemailer.createTransport({
-        service: 'Outlook',
+        service: 'gmail',
         auth: {
           user: EMAIL,
           pass: E_PASS,
@@ -224,7 +224,7 @@ exports.setNewPassword = async (req, res) => {
       
       await user.save();
       const transporter = nodemailer.createTransport({
-        service: 'Outlook',
+        service: 'gmail',
         auth: {
           user: EMAIL,
           pass: E_PASS,
@@ -286,7 +286,7 @@ exports.setNewPassword = async (req, res) => {
       await user.save();
       
       const transporter = nodemailer.createTransport({
-        service: 'Outlook',
+        service: 'gmail',
         auth: {
           user: EMAIL,
           pass: E_PASS,
@@ -339,7 +339,7 @@ exports.setNewPassword = async (req, res) => {
       await user.save();
       
       const transporterEmail = nodemailer.createTransport({
-        service: 'Outlook',
+        service: 'gmail',
         auth: {
           user: EMAIL,
           pass: E_PASS,
